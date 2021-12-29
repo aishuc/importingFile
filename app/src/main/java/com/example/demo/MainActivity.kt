@@ -1,7 +1,6 @@
 package com.example.demo
 
 import android.Manifest
-import android.R.attr
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,8 +13,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import java.io.*
-import java.nio.channels.FileChannel
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 
 
 class MainActivity : AppCompatActivity() {
@@ -65,11 +66,12 @@ class MainActivity : AppCompatActivity() {
             val text: TextView = findViewById(R.id.fileNameT)
 
             val srcFile :File = File(filekapath)
+            val srcfilename : String = srcFile.name
             text.setText(srcFile.name)
             Log.d("Filepath is ", filekapath!!)
 
             var dest =
-                File(Environment.getExternalStorageDirectory().absolutePath + "/resume")
+                File(Environment.getExternalStorageDirectory().absolutePath + "/resume/$srcfilename")
             Log.d("Destination is ", dest.toString())
             val SetToFolder: TextView = findViewById(R.id.folder)
             SetToFolder.setEnabled(true)
@@ -81,10 +83,18 @@ class MainActivity : AppCompatActivity() {
               /*  val inChannel: FileChannel = FileInputStream(attr.src).getChannel()
                 val outChannel: FileChannel = FileOutputStream(dst).getChannel()*/
                 Log.d("ip ", "inputstream $src ")
+                var out = FileOutputStream(dest)
+                val buffer = ByteArray(1024)
+                var len: Int
+                if (src != null) {
+                    while (src.read(buffer).also { len = it } != -1) {
+                        out.write(buffer, 0, len)
+                    }
+                }
                // val out : OutputStream = FileOutputStream(dest)
                // Log.d("op", "outputstream $out ")
-             //  copyFile(src, dest)
-             //   Log.d("copied to ", dest.toString());
+               //copyFile(src, dest)
+                Log.d("copied to ", dest.toString());
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -96,14 +106,16 @@ class MainActivity : AppCompatActivity() {
          /*   @Throws(IOException::class)
             private fun copyFile(src: InputStream?, dest: File) {
 
+
                 Log.d("copy1", "copyFile: t")
 
-               // val inp = FileInputStream(src).channel
+              val inp = FileInputStream(src).channel
                 Log.d("cop2", "copyFile: t")
-               val out = FileOutputStream(dest).channel
+              val out = FileOutputStream(dest).channel
                 Log.d("cop3", "copyFile: t")
                 try {
-                   // FileUtils.copy(FileInputStream(src),FileOutputStream(dest))
+
+                 //  FileUtils.copy(src,FileOutputStream(dest))
                     inp!!.transferTo(0, inp.size(), out)
                     Log.d("cop", "copyFile: dest")
                 } catch (e: Exception) {
