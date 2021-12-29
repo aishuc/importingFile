@@ -1,21 +1,21 @@
 package com.example.demo
 
 import android.Manifest
+import android.R.attr
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.FileUtils
 import android.util.Log
 import android.view.View
-import androidx.annotation.RequiresApi
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.*
+import java.nio.channels.FileChannel
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,41 +55,50 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        var dest: File? = null
-        var source: File? = null
+
         if (requestCode == PICKFILE_RESULT_CODE && resultCode == Activity.RESULT_OK) {
-            val contentDescriber: Uri? = data?.data
-            val src = contentDescriber!!.path
-            source = File(src)
+            val content_describer: Uri? = data?.data
+            val srck = content_describer?.path
+            val source = File(srck)
             Log.d("src is ", source.toString())
-            val filename = contentDescriber.lastPathSegment
-            if (filename != null) {
-                Log.d("FileName is ", filename)
-            }
+            val filekapath = content_describer?.lastPathSegment
+            val text: TextView = findViewById(R.id.fileNameT)
 
-             dest =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            /* File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                 .absolutePath + File.separator + "/GSW/" + filename)*/
-            Log.d("Destination is ", dest.toString());
+            val srcFile :File = File(filekapath)
+            text.setText(srcFile.name)
+            Log.d("Filepath is ", filekapath!!)
+
+            var dest =
+                File(Environment.getExternalStorageDirectory().absolutePath + "/resume")
+            Log.d("Destination is ", dest.toString())
+            val SetToFolder: TextView = findViewById(R.id.folder)
+            SetToFolder.setEnabled(true)
+
+
+          Log.d("Destination is ", dest.toString());
             try {
-                Log.d("tryblock ", dest.toString());
-
-                copyFile(source, dest)
-                Log.d("copied to ", dest.toString());
+                val src : InputStream? = contentResolver.openInputStream(content_describer)
+              /*  val inChannel: FileChannel = FileInputStream(attr.src).getChannel()
+                val outChannel: FileChannel = FileOutputStream(dst).getChannel()*/
+                Log.d("ip ", "inputstream $src ")
+               // val out : OutputStream = FileOutputStream(dest)
+               // Log.d("op", "outputstream $out ")
+             //  copyFile(src, dest)
+             //   Log.d("copied to ", dest.toString());
             } catch (e: IOException) {
                 e.printStackTrace()
             }
 
-        }
+    }
     }
 
 
-            @Throws(IOException::class)
-            private fun copyFile(src: File, dest: File) {
+         /*   @Throws(IOException::class)
+            private fun copyFile(src: InputStream?, dest: File) {
 
                 Log.d("copy1", "copyFile: t")
-                val inp = FileInputStream(src).channel
+
+               // val inp = FileInputStream(src).channel
                 Log.d("cop2", "copyFile: t")
                val out = FileOutputStream(dest).channel
                 Log.d("cop3", "copyFile: t")
@@ -103,7 +112,7 @@ class MainActivity : AppCompatActivity() {
                     inp?.close()
                     out?.close()
                 }
-            }
+            }*/
     }
 
        /* try {
